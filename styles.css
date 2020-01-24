@@ -45,8 +45,8 @@ body {
 
 header {
     text-align: center;
-    font-size: 30px;
-    color: white;
+    font-size: 25px;
+    color: darkgreen;
 }
 
 footer {
@@ -60,4 +60,25 @@ footer {
     font-size: 15px;
     position: fixed;
     padding: 5px;
+}
+
+.game {
+    font-weight: bold;
+    color: white
+}
+
+.gameArea {
+    display: flex;
+}
+.computerArea, .humanArea {
+    width: 100%;
+    min-height: 200px;
+    background-color: darkgreen;
+    text-align: center;
+}
+
+.deck, .ground {
+    text-align: center;
+    min-height: 200px;
+    flex: 1;
 }
