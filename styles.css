@@ -16,7 +16,6 @@ body {
     background-color: black;
     opacity: 0.9;
     font-family: monospace;
-    display: none;
 }
 
 #curtain h1 {
@@ -81,4 +80,40 @@ footer {
     text-align: center;
     min-height: 200px;
     flex: 1;
+}
+
+.deck .cardBack, .ground .cardFront{
+    margin: auto;
+}
+
+.cardFront, .cardBack {
+    font-size: 20px;
+    color: black;
+    width: 100px;
+    height: 150px;
+    border: black 3px solid;
+    border-radius: 10px;
+    margin: 10px;
+}
+
+.cardFront {
+    background-color: blue;
+}
+.cardFront .digit{
+    font-size: 30px;
+}
+
+.cardBack {
+    background: rgb(255,255,255);
+    background: linear-gradient(
+        45deg,
+        rgba(255,255,255,1) 0%,
+        rgba(239,22,22,1) 65%,
+        rgba(255,0,0,1) 100%
+    );
+}
+
+.cards {
+    display: inline-flex;
+    list-style: none;
 }
