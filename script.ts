@@ -109,10 +109,7 @@ class Game {
         this.fillDeck();
         this.shuffleDeck();
         this.insertToGround(this.deck.pop());
-
-        document.querySelector("#curtain").addEventListener('click', function() {
-            document.getElementById("curtain").style.display = "none";
-        });
+        this.setupEventListeners();
     }
 
     public startGame() {
@@ -122,6 +119,22 @@ class Game {
             this.humanPlayer.playTurn();
             this.computerPlayer.playTurn();
         }
+    }
+
+    private setupEventListeners() {
+        document.querySelector("#curtain").addEventListener('click', function() {
+            document.getElementById("curtain").style.display = "none";
+        });
+
+        document.querySelector(".deck .cardBack").addEventListener('click', function() {
+            alert("Human drew card");
+        });
+
+        document.querySelectorAll(".humanArea .cardFront").forEach(function(card) {
+            card.addEventListener('click', function() {
+                alert("Wooo");
+            });
+        });
     }
 
     private drawInitialCards() {

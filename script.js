@@ -100,10 +100,7 @@ var Game = /** @class */ (function () {
         this.fillDeck();
         this.shuffleDeck();
         this.insertToGround(this.deck.pop());
-        document.querySelector("#curtain").addEventListener('click', function () {
-            console.log("Heyyy");
-            document.getElementById("curtain").style.display = "none";
-        });
+        this.setupEventListeners();
     }
     Game.prototype.startGame = function () {
         this.drawInitialCards();
@@ -111,6 +108,20 @@ var Game = /** @class */ (function () {
             this.humanPlayer.playTurn();
             this.computerPlayer.playTurn();
         }
+    };
+    Game.prototype.setupEventListeners = function () {
+        document.querySelector("#curtain").addEventListener('click', function () {
+            document.getElementById("curtain").style.display = "none";
+        });
+        document.querySelector(".deck .cardBack").addEventListener('click', function () {
+            //this.humanPlayer.drawCard();
+            alert("Human drew card");
+        });
+        document.querySelectorAll(".humanArea .cardFront").forEach(function (card) {
+            card.addEventListener('click', function () {
+                alert("Wooo");
+            });
+        });
     };
     Game.prototype.drawInitialCards = function () {
         for (var i = 0; i < 4; i++) {
