@@ -1,5 +1,3 @@
-export {};
-
 interface Card {
     digit: number; // {1, 2, 3, 4, 5, 6, 7, 8}
     color: string; // {'red', 'green', 'blue', 'yellow'}
@@ -104,10 +102,17 @@ class Game {
     constructor() {
         this.humanPlayer = new HumanPlayer(this);
         this.computerPlayer = new ComputerPlayer(this);
+        this.deck = [];
+        this.ground = [];
+        this.state = "running";
 
         this.fillDeck();
         this.shuffleDeck();
         this.insertToGround(this.deck.pop());
+
+        document.querySelector("#curtain").addEventListener('click', function() {
+            document.getElementById("curtain").style.display = "none";
+        });
     }
 
     public startGame() {
@@ -173,3 +178,5 @@ class Game {
         this.state = "end";
     }
 }
+
+let game = new Game();
