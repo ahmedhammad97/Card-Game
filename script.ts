@@ -41,6 +41,10 @@ abstract class Player {
         return this.cards.length === 0;
     }
 
+    clear() {
+        this.cards = [];
+    }
+
     private isValid(firstCard: Card, secondCard: Card): boolean {
         return (firstCard.digit === secondCard.digit) || (firstCard.color === secondCard.color)
     }
@@ -129,6 +133,9 @@ class Game {
     }
 
     public startGame() {
+        this.humanPlayer.clear();
+        this.computerPlayer.clear();
+
         this.drawInitialCards();
         this.renderCards();
         
@@ -273,7 +280,17 @@ class Game {
     }
 
     public announceWinner() {
-        setTimeout(() => {alert("Hooray!")} , 1000);
+        setTimeout(() => {
+            let curtain: HTMLElement = document.querySelector("#curtain");
+            let startBtn: HTMLElement = document.querySelector("#curtain button");
+            let heading: HTMLElement = document.querySelector("#curtain h1");
+
+            if (this.humanPlayer.didWin()) heading.innerHTML = "You Won! Hooraaay";
+            else heading.innerHTML = "Better Luck next time";
+            
+            startBtn.innerHTML = "Restart?";
+            curtain.style.display = 'block';
+        } , 1000);
         this.setGameState("end");
     }
 }

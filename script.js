@@ -39,6 +39,9 @@ var Player = /** @class */ (function () {
     Player.prototype.didWin = function () {
         return this.cards.length === 0;
     };
+    Player.prototype.clear = function () {
+        this.cards = [];
+    };
     Player.prototype.isValid = function (firstCard, secondCard) {
         return (firstCard.digit === secondCard.digit) || (firstCard.color === secondCard.color);
     };
@@ -121,6 +124,8 @@ var Game = /** @class */ (function () {
         this.setupDeckListener();
     }
     Game.prototype.startGame = function () {
+        this.humanPlayer.clear();
+        this.computerPlayer.clear();
         this.drawInitialCards();
         this.renderCards();
         this.humanPlayer.playTurn();
@@ -241,7 +246,18 @@ var Game = /** @class */ (function () {
         this.ground.push(currCard);
     };
     Game.prototype.announceWinner = function () {
-        setTimeout(function () { alert("Hooray!"); }, 1000);
+        var _this = this;
+        setTimeout(function () {
+            var curtain = document.querySelector("#curtain");
+            var startBtn = document.querySelector("#curtain button");
+            var heading = document.querySelector("#curtain h1");
+            if (_this.humanPlayer.didWin())
+                heading.innerHTML = "You Won! Hooraaay";
+            else
+                heading.innerHTML = "Better Luck next time";
+            startBtn.innerHTML = "Restart?";
+            curtain.style.display = 'block';
+        }, 1000);
         this.setGameState("end");
     };
     return Game;
