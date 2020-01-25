@@ -212,7 +212,7 @@ class Game {
 
     private updateGroundCard(groundCard: Card) {
         let groundCardElement: HTMLElement = document.querySelector(".ground .cardFront");
-        groundCardElement.innerHTML = groundCard.digit.toString();
+        groundCardElement.innerHTML = `<span class="digit">${groundCard.digit.toString()}</span>`;
         groundCardElement.style.backgroundColor = groundCard.color;
     }
 
