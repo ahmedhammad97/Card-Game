@@ -70,7 +70,9 @@ footer {
     display: flex;
 }
 .computerArea, .humanArea {
-    width: 100%;
+    margin: auto;
+    border-radius: 10px;
+    width: 80%;
     min-height: 200px;
     background-color: darkgreen;
     text-align: center;
@@ -86,6 +88,10 @@ footer {
     margin: auto;
 }
 
+.deck .cardBack, .humanArea .cardFront{
+    cursor: pointer;
+}
+
 .cardFront, .cardBack {
     font-size: 20px;
     color: black;
@@ -96,9 +102,6 @@ footer {
     margin: 10px;
 }
 
-.cardFront {
-    background-color: blue;
-}
 .cardFront .digit{
     font-size: 30px;
 }

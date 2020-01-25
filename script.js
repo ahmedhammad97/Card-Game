@@ -42,6 +42,9 @@ var Player = /** @class */ (function () {
     Player.prototype.isValid = function (firstCard, secondCard) {
         return (firstCard.digit === secondCard.digit) || (firstCard.color === secondCard.color);
     };
+    Player.prototype.getCardsInHand = function () {
+        return this.cards;
+    };
     return Player;
 }());
 var HumanPlayer = /** @class */ (function (_super) {
@@ -96,27 +99,31 @@ var Game = /** @class */ (function () {
         this.computerPlayer = new ComputerPlayer(this);
         this.deck = [];
         this.ground = [];
-        this.state = "running";
+        this.state = "start";
         this.fillDeck();
         this.shuffleDeck();
         this.insertToGround(this.deck.pop());
-        this.setupEventListeners();
+        this.setupCurtainListener();
+        this.setupDeckListener();
     }
     Game.prototype.startGame = function () {
         this.drawInitialCards();
-        while (this.state !== "end") {
-            this.humanPlayer.playTurn();
-            this.computerPlayer.playTurn();
-        }
+        this.humanPlayer.playTurn();
+        this.renderCards();
+        this.setupHumanCardListener();
     };
-    Game.prototype.setupEventListeners = function () {
-        document.querySelector("#curtain").addEventListener('click', function () {
+    Game.prototype.setupCurtainListener = function () {
+        document.querySelector("#curtain button").addEventListener('click', function () {
             document.getElementById("curtain").style.display = "none";
+            game.startGame();
         });
+    };
+    Game.prototype.setupDeckListener = function () {
         document.querySelector(".deck .cardBack").addEventListener('click', function () {
-            //this.humanPlayer.drawCard();
             alert("Human drew card");
         });
+    };
+    Game.prototype.setupHumanCardListener = function () {
         document.querySelectorAll(".humanArea .cardFront").forEach(function (card) {
             card.addEventListener('click', function () {
                 alert("Wooo");
@@ -127,6 +134,37 @@ var Game = /** @class */ (function () {
         for (var i = 0; i < 4; i++) {
             this.humanPlayer.drawCard();
             this.computerPlayer.drawCard();
+        }
+    };
+    Game.prototype.renderCards = function () {
+        var computerCardsCount = this.computerPlayer.getCardsInHand().length;
+        var humanCards = this.humanPlayer.getCardsInHand();
+        var groundCard = this.ground[this.ground.length - 1];
+        this.updateGroundCard(groundCard);
+        this.updateComputerCards(computerCardsCount);
+        this.updateHumanCards(humanCards);
+    };
+    Game.prototype.updateGroundCard = function (groundCard) {
+        var groundCardElement = document.querySelector(".ground .cardFront");
+        groundCardElement.innerHTML = groundCard.digit.toString();
+        groundCardElement.style.backgroundColor = groundCard.color;
+    };
+    Game.prototype.updateComputerCards = function (computerCardsCount) {
+        var computerCardList = document.querySelector(".computerArea .cards");
+        computerCardList.innerHTML = '';
+        for (var i = 0; i < computerCardsCount; i++) {
+            var backCard = "<li><div class=\"cardBack\"></div></li>";
+            computerCardList.innerHTML += backCard;
+        }
+    };
+    Game.prototype.updateHumanCards = function (humanCards) {
+        var computerCardList = document.querySelector(".humanArea .cards");
+        computerCardList.innerHTML = '';
+        for (var i = 0; i < humanCards.length; i++) {
+            var digit = humanCards[i].digit;
+            var color = humanCards[i].color;
+            var frontCard = "<div class=\"cardFront\" style=\"background-color:" + color + ";\">\n            <span class=\"digit\">" + digit + "</span>\n            </div>";
+            computerCardList.innerHTML += frontCard;
         }
     };
     Game.prototype.fillDeck = function () {
@@ -165,8 +203,10 @@ var Game = /** @class */ (function () {
         this.ground.push(currCard);
     };
     Game.prototype.announceWinner = function () {
-        alert("Hooray!");
-        this.state = "end";
+        if (this.state !== "start") {
+            alert("Hooray!");
+            this.state = "end";
+        }
     };
     return Game;
 }());

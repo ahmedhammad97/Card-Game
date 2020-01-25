@@ -44,6 +44,10 @@ abstract class Player {
     private isValid(firstCard: Card, secondCard: Card): boolean {
         return (firstCard.digit === secondCard.digit) || (firstCard.color === secondCard.color)
     }
+
+    public getCardsInHand(): Array<Card> {
+        return this.cards;
+    }
 }
 
 class HumanPlayer extends Player {
@@ -104,32 +108,39 @@ class Game {
         this.computerPlayer = new ComputerPlayer(this);
         this.deck = [];
         this.ground = [];
-        this.state = "running";
+        this.state = "start";
 
         this.fillDeck();
         this.shuffleDeck();
         this.insertToGround(this.deck.pop());
-        this.setupEventListeners();
+        this.setupCurtainListener();
+        this.setupDeckListener();
     }
 
     public startGame() {
         this.drawInitialCards();
+        
 
-        while (this.state !== "end") {
-            this.humanPlayer.playTurn();
-            this.computerPlayer.playTurn();
-        }
+        this.humanPlayer.playTurn();
+
+        this.renderCards();
+        this.setupHumanCardListener();
     }
 
-    private setupEventListeners() {
-        document.querySelector("#curtain").addEventListener('click', function() {
+    private setupCurtainListener() {
+        document.querySelector("#curtain button").addEventListener('click', function() {
             document.getElementById("curtain").style.display = "none";
+            game.startGame();
         });
+    }
 
+    private setupDeckListener() {
         document.querySelector(".deck .cardBack").addEventListener('click', function() {
             alert("Human drew card");
         });
+    }
 
+    private setupHumanCardListener() {
         document.querySelectorAll(".humanArea .cardFront").forEach(function(card) {
             card.addEventListener('click', function() {
                 alert("Wooo");
@@ -141,6 +152,46 @@ class Game {
         for (let i = 0; i < 4; i++) {
             this.humanPlayer.drawCard();
             this.computerPlayer.drawCard();
+        }
+    }
+
+    private renderCards() {
+        let computerCardsCount = this.computerPlayer.getCardsInHand().length;
+        let humanCards = this.humanPlayer.getCardsInHand();
+        let groundCard = this.ground[this.ground.length - 1];
+
+        this.updateGroundCard(groundCard);
+        this.updateComputerCards(computerCardsCount);
+        this.updateHumanCards(humanCards);
+    }
+
+    private updateGroundCard(groundCard: Card) {
+        let groundCardElement: HTMLElement = document.querySelector(".ground .cardFront");
+        groundCardElement.innerHTML = groundCard.digit.toString();
+        groundCardElement.style.backgroundColor = groundCard.color;
+    }
+
+    private updateComputerCards(computerCardsCount: number) {
+        let computerCardList: HTMLElement = document.querySelector(".computerArea .cards");
+        computerCardList.innerHTML = '';
+
+        for (let i = 0; i < computerCardsCount; i++) {
+            let backCard = `<li><div class="cardBack"></div></li>`;
+            computerCardList.innerHTML += backCard;
+        }
+    }
+
+    private updateHumanCards(humanCards: Array<Card>) {
+        let computerCardList: HTMLElement = document.querySelector(".humanArea .cards");
+        computerCardList.innerHTML = '';
+
+        for (let i = 0; i < humanCards.length; i++) {
+            let digit = humanCards[i].digit;
+            let color = humanCards[i].color;
+            let frontCard = `<div class="cardFront" style="background-color:${color};">
+            <span class="digit">${digit}</span>
+            </div>`;
+            computerCardList.innerHTML += frontCard;
         }
     }
 
@@ -187,8 +238,10 @@ class Game {
     }
 
     public announceWinner() {
-        alert("Hooray!");
-        this.state = "end";
+        if(this.state !== "start"){
+            alert("Hooray!");
+            this.state = "end";
+        }
     }
 }
 
