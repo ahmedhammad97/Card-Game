@@ -150,9 +150,11 @@ var Game = /** @class */ (function () {
             card.addEventListener('click', function (event) {
                 if (game.getGameState() === "play") {
                     var selectedCard = event.target;
-                    var index = parseInt(selectedCard.getAttribute("index"));
-                    game.humanPlayer.playCard(index);
-                    game.completeTurn();
+                    if (selectedCard.parentElement.classList.contains("raise")) {
+                        var index = parseInt(selectedCard.getAttribute("index"));
+                        game.humanPlayer.playCard(index);
+                        game.completeTurn();
+                    }
                 }
             });
         });
@@ -163,6 +165,7 @@ var Game = /** @class */ (function () {
         setTimeout(function () {
             game.computerPlayer.playTurn();
             game.renderCards();
+            game.humanPlayer.playTurn();
         }, 1000);
     };
     Game.prototype.drawInitialCards = function () {

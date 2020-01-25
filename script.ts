@@ -164,9 +164,11 @@ class Game {
             card.addEventListener('click', function(event) {
                 if (game.getGameState() === "play") {
                     let selectedCard = (event.target as HTMLElement);
-                    let index: number = parseInt(selectedCard.getAttribute("index"));
-                    game.humanPlayer.playCard(index);
-                    game.completeTurn();
+                    if (selectedCard.parentElement.classList.contains("raise")) {
+                        let index: number = parseInt(selectedCard.getAttribute("index"));
+                        game.humanPlayer.playCard(index);
+                        game.completeTurn();
+                    }
                 }
             });
         });
@@ -178,6 +180,7 @@ class Game {
         setTimeout(() => {
             game.computerPlayer.playTurn();
             game.renderCards();
+            game.humanPlayer.playTurn();
         }, 1000);
     }
 
