@@ -28,7 +28,7 @@ var Player = /** @class */ (function () {
     Player.prototype.playCard = function (index) {
         var toPlayCard = this.cards[index];
         this.cards.splice(index, 1);
-        this.game.addCardToGround(toPlayCard);
+        this.game.insertToGround(toPlayCard);
         if (this.didWin)
             this.game.announceWinner();
     };
@@ -58,7 +58,7 @@ var HumanPlayer = /** @class */ (function (_super) {
         if (possibleCards.length === 0)
             this.highlightDeck();
         else
-            this.highlightPossibleCards();
+            this.highlightPossibleCards(possibleCards);
     };
     HumanPlayer.prototype.playCard = function (index) {
         this.dimPossibleCards();
@@ -68,13 +68,27 @@ var HumanPlayer = /** @class */ (function (_super) {
         this.dimDeck();
         _super.prototype.drawCard.call(this);
     };
-    HumanPlayer.prototype.highlightPossibleCards = function () {
+    HumanPlayer.prototype.highlightPossibleCards = function (possibleCards) {
+        this.game.setGameState("play");
+        var cardList = document.querySelector(".humanArea .cards").children;
+        possibleCards.forEach(function (card) {
+            cardList[card].classList.add("raise");
+        });
     };
     HumanPlayer.prototype.highlightDeck = function () {
+        this.game.setGameState("draw");
+        var deck = document.querySelector(".deck .cardBack");
+        deck.classList.add("glow");
     };
     HumanPlayer.prototype.dimPossibleCards = function () {
+        var cardList = document.querySelector(".humanArea .cards").children;
+        for (var i = 0; i < cardList.length; i++) {
+            cardList[i].classList.remove("raise");
+        }
     };
     HumanPlayer.prototype.dimDeck = function () {
+        var deck = document.querySelector(".deck .cardBack");
+        deck.classList.remove("glow");
     };
     return HumanPlayer;
 }(Player));
@@ -89,7 +103,7 @@ var ComputerPlayer = /** @class */ (function (_super) {
         if (possibleCards.length === 0)
             this.drawCard();
         else
-            this.playCard(0);
+            this.playCard(possibleCards[0]);
     };
     return ComputerPlayer;
 }(Player));
@@ -108,9 +122,14 @@ var Game = /** @class */ (function () {
     }
     Game.prototype.startGame = function () {
         this.drawInitialCards();
-        this.humanPlayer.playTurn();
         this.renderCards();
-        this.setupHumanCardListener();
+        this.humanPlayer.playTurn();
+    };
+    Game.prototype.getGameState = function () {
+        return this.state;
+    };
+    Game.prototype.setGameState = function (state) {
+        this.state = state;
     };
     Game.prototype.setupCurtainListener = function () {
         document.querySelector("#curtain button").addEventListener('click', function () {
@@ -120,15 +139,31 @@ var Game = /** @class */ (function () {
     };
     Game.prototype.setupDeckListener = function () {
         document.querySelector(".deck .cardBack").addEventListener('click', function () {
-            alert("Human drew card");
+            if (game.getGameState() === "draw") {
+                game.humanPlayer.drawCard();
+                game.completeTurn();
+            }
         });
     };
     Game.prototype.setupHumanCardListener = function () {
         document.querySelectorAll(".humanArea .cardFront").forEach(function (card) {
-            card.addEventListener('click', function () {
-                alert("Wooo");
+            card.addEventListener('click', function (event) {
+                if (game.getGameState() === "play") {
+                    var selectedCard = event.target;
+                    var index = parseInt(selectedCard.getAttribute("index"));
+                    game.humanPlayer.playCard(index);
+                    game.completeTurn();
+                }
             });
         });
+    };
+    Game.prototype.completeTurn = function () {
+        this.renderCards();
+        this.setGameState("computer");
+        setTimeout(function () {
+            game.computerPlayer.playTurn();
+            game.renderCards();
+        }, 1000);
     };
     Game.prototype.drawInitialCards = function () {
         for (var i = 0; i < 4; i++) {
@@ -143,6 +178,7 @@ var Game = /** @class */ (function () {
         this.updateGroundCard(groundCard);
         this.updateComputerCards(computerCardsCount);
         this.updateHumanCards(humanCards);
+        this.setupHumanCardListener();
     };
     Game.prototype.updateGroundCard = function (groundCard) {
         var groundCardElement = document.querySelector(".ground .cardFront");
@@ -163,7 +199,7 @@ var Game = /** @class */ (function () {
         for (var i = 0; i < humanCards.length; i++) {
             var digit = humanCards[i].digit;
             var color = humanCards[i].color;
-            var frontCard = "<div class=\"cardFront\" style=\"background-color:" + color + ";\">\n            <span class=\"digit\">" + digit + "</span>\n            </div>";
+            var frontCard = "<li><div class=\"cardFront\" index=\"" + i + "\" style=\"background-color:" + color + ";\">\n            <span class=\"digit\">" + digit + "</span>\n            </div></li>";
             computerCardList.innerHTML += frontCard;
         }
     };
@@ -184,9 +220,6 @@ var Game = /** @class */ (function () {
     Game.prototype.getCurrCard = function () {
         return this.ground[this.ground.length - 1];
     };
-    Game.prototype.addCardToGround = function (card) {
-        this.ground.push(card);
-    };
     Game.prototype.drawCardFromDeck = function () {
         if (this.deck.length === 0) {
             this.moveGroundToDeck();
@@ -195,6 +228,8 @@ var Game = /** @class */ (function () {
         return newCard;
     };
     Game.prototype.moveGroundToDeck = function () {
+        if (this.ground.length < 2)
+            alert("No more cards!");
         var currCard = this.ground.pop();
         while (this.ground.length > 0) {
             this.deck.push(this.ground.pop());
@@ -203,9 +238,9 @@ var Game = /** @class */ (function () {
         this.ground.push(currCard);
     };
     Game.prototype.announceWinner = function () {
-        if (this.state !== "start") {
-            alert("Hooray!");
-            this.state = "end";
+        if (this.getGameState() !== "start") {
+            //alert("Hooray!");
+            this.setGameState("end");
         }
     };
     return Game;

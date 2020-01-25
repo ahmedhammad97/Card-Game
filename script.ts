@@ -27,7 +27,7 @@ abstract class Player {
     playCard(index: number) {
         let toPlayCard = this.cards[index];
         this.cards.splice(index, 1);
-        this.game.addCardToGround(toPlayCard);
+        this.game.insertToGround(toPlayCard);
         
         if (this.didWin) this.game.announceWinner();
     }
@@ -55,7 +55,7 @@ class HumanPlayer extends Player {
         let currCard: Card = this.game.getCurrCard();
         let possibleCards: Array<number> = this.scanCards(currCard);
         if (possibleCards.length === 0) this.highlightDeck();
-        else this.highlightPossibleCards()
+        else this.highlightPossibleCards(possibleCards);
     }
 
     playCard(index: number) {
@@ -68,20 +68,31 @@ class HumanPlayer extends Player {
         super.drawCard();
     }
 
-    private highlightPossibleCards() {
-
+    private highlightPossibleCards(possibleCards: Array<number>) {
+        this.game.setGameState("play");
+        let cardList: HTMLCollection = document.querySelector(".humanArea .cards").children;
+        possibleCards.forEach(card => {
+            cardList[card].classList.add("raise");
+        })
+        
     }
 
     private highlightDeck() {
-
+        this.game.setGameState("draw");
+        let deck: HTMLElement = document.querySelector(".deck .cardBack");
+        deck.classList.add("glow");
     }
 
     private dimPossibleCards() {
-
+        let cardList: HTMLCollection = document.querySelector(".humanArea .cards").children;
+        for (let i = 0; i < cardList.length; i++) {
+            cardList[i].classList.remove("raise");
+        }
     }
 
     private dimDeck() {
-
+        let deck: HTMLElement = document.querySelector(".deck .cardBack");
+        deck.classList.remove("glow");
     }
 
 
@@ -92,7 +103,7 @@ class ComputerPlayer extends Player {
         let currCard: Card = this.game.getCurrCard();
         let possibleCards: Array<number> = this.scanCards(currCard);
         if (possibleCards.length === 0) this.drawCard();
-        else this.playCard(0);
+        else this.playCard(possibleCards[0]);
     }
 }
 
@@ -119,12 +130,17 @@ class Game {
 
     public startGame() {
         this.drawInitialCards();
-        
-
-        this.humanPlayer.playTurn();
-
         this.renderCards();
-        this.setupHumanCardListener();
+        
+        this.humanPlayer.playTurn();
+    }
+
+    public getGameState(): string {
+        return this.state;
+    }
+
+    public setGameState(state: string) {
+        this.state = state;
     }
 
     private setupCurtainListener() {
@@ -136,16 +152,33 @@ class Game {
 
     private setupDeckListener() {
         document.querySelector(".deck .cardBack").addEventListener('click', function() {
-            alert("Human drew card");
+            if (game.getGameState() === "draw"){
+                game.humanPlayer.drawCard();
+                game.completeTurn();
+            }
         });
     }
 
     private setupHumanCardListener() {
         document.querySelectorAll(".humanArea .cardFront").forEach(function(card) {
-            card.addEventListener('click', function() {
-                alert("Wooo");
+            card.addEventListener('click', function(event) {
+                if (game.getGameState() === "play") {
+                    let selectedCard = (event.target as HTMLElement);
+                    let index: number = parseInt(selectedCard.getAttribute("index"));
+                    game.humanPlayer.playCard(index);
+                    game.completeTurn();
+                }
             });
         });
+    }
+
+    private completeTurn() {
+        this.renderCards();
+        this.setGameState("computer");
+        setTimeout(() => {
+            game.computerPlayer.playTurn();
+            game.renderCards();
+        }, 1000);
     }
 
     private drawInitialCards() {
@@ -163,6 +196,8 @@ class Game {
         this.updateGroundCard(groundCard);
         this.updateComputerCards(computerCardsCount);
         this.updateHumanCards(humanCards);
+
+        this.setupHumanCardListener();
     }
 
     private updateGroundCard(groundCard: Card) {
@@ -188,9 +223,9 @@ class Game {
         for (let i = 0; i < humanCards.length; i++) {
             let digit = humanCards[i].digit;
             let color = humanCards[i].color;
-            let frontCard = `<div class="cardFront" style="background-color:${color};">
+            let frontCard = `<li><div class="cardFront" index="${i}" style="background-color:${color};">
             <span class="digit">${digit}</span>
-            </div>`;
+            </div></li>`;
             computerCardList.innerHTML += frontCard;
         }
     }
@@ -216,10 +251,6 @@ class Game {
         return this.ground[this.ground.length - 1];
     }
 
-    public addCardToGround(card: Card) {
-        this.ground.push(card);
-    }
-
     public drawCardFromDeck(): Card {
         if (this.deck.length === 0) {
             this.moveGroundToDeck();
@@ -229,6 +260,7 @@ class Game {
     }
 
     private moveGroundToDeck() {
+        if(this.ground.length < 2) alert("No more cards!");
         let currCard = this.ground.pop();
         while(this.ground.length > 0) {
             this.deck.push(this.ground.pop());
@@ -238,9 +270,9 @@ class Game {
     }
 
     public announceWinner() {
-        if(this.state !== "start"){
-            alert("Hooray!");
-            this.state = "end";
+        if(this.getGameState() !== "start"){
+            //alert("Hooray!");
+            this.setGameState("end");
         }
     }
 }
