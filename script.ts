@@ -29,7 +29,7 @@ abstract class Player {
         this.cards.splice(index, 1);
         this.game.insertToGround(toPlayCard);
         
-        if (this.didWin) this.game.announceWinner();
+        if (this.didWin()) this.game.announceWinner();
     }
 
     drawCard () {
@@ -273,10 +273,8 @@ class Game {
     }
 
     public announceWinner() {
-        if(this.getGameState() !== "start"){
-            //alert("Hooray!");
-            this.setGameState("end");
-        }
+        setTimeout(() => {alert("Hooray!")} , 1000);
+        this.setGameState("end");
     }
 }
 

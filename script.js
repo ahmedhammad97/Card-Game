@@ -29,7 +29,7 @@ var Player = /** @class */ (function () {
         var toPlayCard = this.cards[index];
         this.cards.splice(index, 1);
         this.game.insertToGround(toPlayCard);
-        if (this.didWin)
+        if (this.didWin())
             this.game.announceWinner();
     };
     Player.prototype.drawCard = function () {
@@ -241,10 +241,8 @@ var Game = /** @class */ (function () {
         this.ground.push(currCard);
     };
     Game.prototype.announceWinner = function () {
-        if (this.getGameState() !== "start") {
-            //alert("Hooray!");
-            this.setGameState("end");
-        }
+        setTimeout(function () { alert("Hooray!"); }, 1000);
+        this.setGameState("end");
     };
     return Game;
 }());
