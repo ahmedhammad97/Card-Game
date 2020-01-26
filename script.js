@@ -117,15 +117,17 @@ var Game = /** @class */ (function () {
         this.deck = [];
         this.ground = [];
         this.state = "start";
-        this.fillDeck();
-        this.shuffleDeck();
-        this.insertToGround(this.deck.pop());
         this.setupCurtainListener();
         this.setupDeckListener();
     }
     Game.prototype.startGame = function () {
         this.humanPlayer.clear();
         this.computerPlayer.clear();
+        this.clearGround();
+        this.clearDeck();
+        this.fillDeck();
+        this.shuffleDeck();
+        this.insertToGround(this.deck.pop());
         this.drawInitialCards();
         this.renderCards();
         this.humanPlayer.playTurn();
@@ -210,6 +212,12 @@ var Game = /** @class */ (function () {
             var frontCard = "<li><div class=\"cardFront\" index=\"" + i + "\" style=\"background-color:" + color + ";\">\n            <span class=\"digit\">" + digit + "</span>\n            </div></li>";
             computerCardList.innerHTML += frontCard;
         }
+    };
+    Game.prototype.clearGround = function () {
+        this.ground = [];
+    };
+    Game.prototype.clearDeck = function () {
+        this.deck = [];
     };
     Game.prototype.fillDeck = function () {
         var colors = ['red', 'lime', 'blue', 'yellow'];

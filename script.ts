@@ -125,9 +125,6 @@ class Game {
         this.ground = [];
         this.state = "start";
 
-        this.fillDeck();
-        this.shuffleDeck();
-        this.insertToGround(this.deck.pop());
         this.setupCurtainListener();
         this.setupDeckListener();
     }
@@ -135,6 +132,13 @@ class Game {
     public startGame() {
         this.humanPlayer.clear();
         this.computerPlayer.clear();
+        
+        this.clearGround();
+        this.clearDeck();
+
+        this.fillDeck();
+        this.shuffleDeck();
+        this.insertToGround(this.deck.pop());
 
         this.drawInitialCards();
         this.renderCards();
@@ -238,6 +242,14 @@ class Game {
             </div></li>`;
             computerCardList.innerHTML += frontCard;
         }
+    }
+
+    private clearGround() {
+        this.ground = [];
+    }
+
+    private clearDeck() {
+        this.deck = [];
     }
 
     private fillDeck() {
