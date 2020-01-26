@@ -1,21 +1,30 @@
 <html lang="en">
 <head>
+    <!-- Some configurations that you might want to ignore -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
     <title>Card Game</title>
+    <!-- Stylesheet -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+    <!-- The overlay black curtain -->
     <section id="curtain">
         <h1>Card Game</h1>
         <button>Start Game</button>
     </section>
 
+
     <header>
         <h1>Card Game</h1>
     </header>
 
+
+    <!-- The game section contains all the four game areas 
+    (computer area, deck area, ground area, and human area) -->
     <section class="game">
 
         <div class="computerArea">
@@ -23,11 +32,13 @@
             <ul class="cards"></ul>
         </div>
 
+        <!-- Game area is a wrapper for the deck, and the ground to help styling them as one unit -->
         <div class="gameArea">
             <div class="deck">
                 <span>Deck</span>
                 <div class="cardBack"></div>
             </div>
+
             <div class="ground">
                 <span>Ground</span>
                 <div class="cardFront"><span class="digit"></span></div>
@@ -41,8 +52,9 @@
 
     </section>
 
-    <footer>Made by <b>Your name</b></footer>
+    <footer>Made by <b>Ahmed Hammad</b></footer>
 
+    <!-- The JavaScript resulted from compiling the script.ts file -->
     <script src="script.js"></script>
 </body>
 </html>
