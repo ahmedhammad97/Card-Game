@@ -3,7 +3,7 @@
 }
 
 body {
-    background-color: green;
+    background-color: forestgreen;
     margin: 0;
     padding: 0;
     font-family: monospace;
@@ -104,16 +104,20 @@ footer {
 
 .cardFront .digit{
     font-size: 30px;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 150px;
 }
 
 .cardBack {
     background: rgb(255,255,255);
-    background: linear-gradient(
-        45deg,
-        rgba(255,255,255,1) 0%,
-        rgba(239,22,22,1) 65%,
-        rgba(255,0,0,1) 100%
-    );
+}
+
+.cardBack:after {
+    content: "\A\A Card\A Game";
+    white-space: pre;
+    align-content: center;
+    font-size: 20px;
 }
 
 .cards {
