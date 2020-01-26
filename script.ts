@@ -1,6 +1,6 @@
 interface Card {
     digit: number; // {1, 2, 3, 4, 5, 6, 7, 8}
-    color: string; // {'red', 'green', 'blue', 'yellow'}
+    color: string; // {'red', 'lime', 'blue', 'yellow'}
 }
 
 abstract class Player {
@@ -241,7 +241,7 @@ class Game {
     }
 
     private fillDeck() {
-        let colors = ['red', 'green', 'blue', 'yellow'];
+        let colors = ['red', 'lime', 'blue', 'yellow'];
         for (let i = 0; i < 4; i++) {
             for (let j = 1; j < 9; j++) {
                 this.deck.push({digit: j, color: colors[i]})

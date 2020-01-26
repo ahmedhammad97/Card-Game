@@ -212,7 +212,7 @@ var Game = /** @class */ (function () {
         }
     };
     Game.prototype.fillDeck = function () {
-        var colors = ['red', 'green', 'blue', 'yellow'];
+        var colors = ['red', 'lime', 'blue', 'yellow'];
         for (var i = 0; i < 4; i++) {
             for (var j = 1; j < 9; j++) {
                 this.deck.push({ digit: j, color: colors[i] });
