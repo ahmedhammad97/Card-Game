@@ -1,3 +1,32 @@
+/**
+ * The game logic has been built using 5 entities:
+ *
+ * 1- Card Interface:
+ * A wrapper for a card object.
+ * Ex. {digit: 5, color: 'blue'}
+ *
+ * 2- Player Class:
+ * An abstract class that contains the common
+ * attributes and functionalities between both human,
+ * and computer players.
+ *
+ * 3- HumanPlayer Class:
+ * Its functionality is split into two parts:
+ * - Automated functionalities, that highlights cards,
+ *   and update the model cards, etc.
+ * - Event-driven functionalities, that are only invoked when
+ *   the user himself fires an event (mouse click).
+ *
+ * 4- ComputerPlayer Class:
+ * Completely automated functionalities that does its job
+ * without waiting for user interaction.
+ *
+ * 5- Game Class:
+ * The main class that controls all the previously mentioned entites.
+ * It's responsible for all the interaction between the players, deck, and ground,
+ * and responsible for listening to the user events, handling them, and for
+ * rendering the cards to view after every update.
+ */
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -16,15 +45,6 @@ var Player = /** @class */ (function () {
         this.game = game;
         this.cards = [];
     }
-    Player.prototype.scanCards = function (currentCard) {
-        var validCards = [];
-        for (var i = 0; i < this.cards.length; i++) {
-            if (this.isValid(currentCard, this.cards[i])) {
-                validCards.push(i);
-            }
-        }
-        return validCards;
-    };
     Player.prototype.playCard = function (index) {
         var toPlayCard = this.cards[index];
         this.cards.splice(index, 1);
@@ -39,14 +59,32 @@ var Player = /** @class */ (function () {
     Player.prototype.didWin = function () {
         return this.cards.length === 0;
     };
-    Player.prototype.clear = function () {
+    Player.prototype.clearCards = function () {
         this.cards = [];
-    };
-    Player.prototype.isValid = function (firstCard, secondCard) {
-        return (firstCard.digit === secondCard.digit) || (firstCard.color === secondCard.color);
     };
     Player.prototype.getCardsInHand = function () {
         return this.cards;
+    };
+    // Scans all the cards in hand, and returns a list of valid cards to play
+    Player.prototype.scanCards = function (currentCard) {
+        var validCards = [];
+        for (var i = 0; i < this.cards.length; i++) {
+            if (this.isValid(currentCard, this.cards[i])) {
+                validCards.push(i);
+            }
+        }
+        return validCards;
+    };
+    Player.prototype.getGameCurrCard = function () {
+        return this.game.getCurrCard();
+    };
+    Player.prototype.setGameState = function (state) {
+        this.game.setGameState(state);
+    };
+    // Checks if a card is valid to play
+    Player.prototype.isValid = function (firstCard, secondCard) {
+        return (firstCard.digit === secondCard.digit) ||
+            (firstCard.color === secondCard.color);
     };
     return Player;
 }());
@@ -56,7 +94,7 @@ var HumanPlayer = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     HumanPlayer.prototype.playTurn = function () {
-        var currCard = this.game.getCurrCard();
+        var currCard = this.getGameCurrCard();
         var possibleCards = this.scanCards(currCard);
         if (possibleCards.length === 0)
             this.highlightDeck();
@@ -72,19 +110,21 @@ var HumanPlayer = /** @class */ (function (_super) {
         _super.prototype.drawCard.call(this);
     };
     HumanPlayer.prototype.highlightPossibleCards = function (possibleCards) {
-        this.game.setGameState("play");
-        var cardList = document.querySelector(".humanArea .cards").children;
+        this.setGameState("play");
+        var cardList;
+        cardList = document.querySelector(".humanArea .cards").children;
         possibleCards.forEach(function (card) {
             cardList[card].classList.add("raise");
         });
     };
     HumanPlayer.prototype.highlightDeck = function () {
-        this.game.setGameState("draw");
+        this.setGameState("draw");
         var deck = document.querySelector(".deck .cardBack");
         deck.classList.add("glow");
     };
     HumanPlayer.prototype.dimPossibleCards = function () {
-        var cardList = document.querySelector(".humanArea .cards").children;
+        var cardList;
+        cardList = document.querySelector(".humanArea .cards").children;
         for (var i = 0; i < cardList.length; i++) {
             cardList[i].classList.remove("raise");
         }
@@ -101,7 +141,7 @@ var ComputerPlayer = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     ComputerPlayer.prototype.playTurn = function () {
-        var currCard = this.game.getCurrCard();
+        var currCard = this.getGameCurrCard();
         var possibleCards = this.scanCards(currCard);
         if (possibleCards.length === 0)
             this.drawCard();
@@ -121,8 +161,8 @@ var Game = /** @class */ (function () {
         this.setupDeckListener();
     }
     Game.prototype.startGame = function () {
-        this.humanPlayer.clear();
-        this.computerPlayer.clear();
+        this.humanPlayer.clearCards();
+        this.computerPlayer.clearCards();
         this.clearGround();
         this.clearDeck();
         this.fillDeck();
@@ -138,14 +178,44 @@ var Game = /** @class */ (function () {
     Game.prototype.setGameState = function (state) {
         this.state = state;
     };
+    Game.prototype.insertToGround = function (card) {
+        this.ground.push(card);
+    };
+    Game.prototype.getCurrCard = function () {
+        return this.ground[this.ground.length - 1];
+    };
+    Game.prototype.drawCardFromDeck = function () {
+        if (this.deck.length === 0) {
+            this.moveGroundToDeck();
+        }
+        var newCard = this.deck.pop();
+        return newCard;
+    };
+    Game.prototype.announceWinner = function () {
+        var _this = this;
+        setTimeout(function () {
+            var curtain = document.querySelector("#curtain");
+            var startBtn = document.querySelector("#curtain button");
+            var heading = document.querySelector("#curtain h1");
+            if (_this.humanPlayer.didWin())
+                heading.innerHTML = "You Won! Hooraaay";
+            else
+                heading.innerHTML = "Better Luck next time";
+            startBtn.innerHTML = "Restart?";
+            curtain.style.display = 'block';
+        }, 1000);
+        this.setGameState("end");
+    };
     Game.prototype.setupCurtainListener = function () {
-        document.querySelector("#curtain button").addEventListener('click', function () {
+        document.querySelector("#curtain button")
+            .addEventListener('click', function () {
             document.getElementById("curtain").style.display = "none";
             game.startGame();
         });
     };
     Game.prototype.setupDeckListener = function () {
-        document.querySelector(".deck .cardBack").addEventListener('click', function () {
+        document.querySelector(".deck .cardBack")
+            .addEventListener('click', function () {
             if (game.getGameState() === "draw") {
                 game.humanPlayer.drawCard();
                 game.completeTurn();
@@ -153,12 +223,14 @@ var Game = /** @class */ (function () {
         });
     };
     Game.prototype.setupHumanCardListener = function () {
-        document.querySelectorAll(".humanArea .cardFront").forEach(function (card) {
+        document.querySelectorAll(".humanArea .cardFront")
+            .forEach(function (card) {
             card.addEventListener('click', function (event) {
                 if (game.getGameState() === "play") {
                     var selectedCard = event.target;
                     if (selectedCard.parentElement.classList.contains("raise")) {
-                        var index = parseInt(selectedCard.getAttribute("index"));
+                        var index = void 0;
+                        index = parseInt(selectedCard.getAttribute("index"));
                         game.humanPlayer.playCard(index);
                         game.completeTurn();
                     }
@@ -191,12 +263,16 @@ var Game = /** @class */ (function () {
         this.setupHumanCardListener();
     };
     Game.prototype.updateGroundCard = function (groundCard) {
-        var groundCardElement = document.querySelector(".ground .cardFront");
-        groundCardElement.innerHTML = "<span class=\"digit\">" + groundCard.digit.toString() + "</span>";
+        var groundCardElement;
+        groundCardElement = document.querySelector(".ground .cardFront");
+        var strDigit = groundCard.digit.toString();
+        var cardTag = "<span class=\"digit\">" + strDigit + "</span>";
+        groundCardElement.innerHTML = cardTag;
         groundCardElement.style.backgroundColor = groundCard.color;
     };
     Game.prototype.updateComputerCards = function (computerCardsCount) {
-        var computerCardList = document.querySelector(".computerArea .cards");
+        var computerCardList;
+        computerCardList = document.querySelector(".computerArea .cards");
         computerCardList.innerHTML = '';
         for (var i = 0; i < computerCardsCount; i++) {
             var backCard = "<li><div class=\"cardBack\"></div></li>";
@@ -204,12 +280,13 @@ var Game = /** @class */ (function () {
         }
     };
     Game.prototype.updateHumanCards = function (humanCards) {
-        var computerCardList = document.querySelector(".humanArea .cards");
+        var computerCardList;
+        computerCardList = document.querySelector(".humanArea .cards");
         computerCardList.innerHTML = '';
         for (var i = 0; i < humanCards.length; i++) {
             var digit = humanCards[i].digit;
             var color = humanCards[i].color;
-            var frontCard = "<li><div class=\"cardFront\" index=\"" + i + "\" style=\"background-color:" + color + ";\">\n            <span class=\"digit\">" + digit + "</span>\n            </div></li>";
+            var frontCard = "<li><div class=\"cardFront\" index=\"" + i + "\" \n            style=\"background-color:" + color + ";\">\n            <span class=\"digit\">" + digit + "</span>\n            </div></li>";
             computerCardList.innerHTML += frontCard;
         }
     };
@@ -228,45 +305,20 @@ var Game = /** @class */ (function () {
         }
     };
     Game.prototype.shuffleDeck = function () {
+        // Sorting the deck with a fairly random criteria (50%)
         this.deck.sort(function () { return Math.random() - 0.5; });
-    };
-    Game.prototype.insertToGround = function (card) {
-        this.ground.push(card);
-    };
-    Game.prototype.getCurrCard = function () {
-        return this.ground[this.ground.length - 1];
-    };
-    Game.prototype.drawCardFromDeck = function () {
-        if (this.deck.length === 0) {
-            this.moveGroundToDeck();
-        }
-        var newCard = this.deck.pop();
-        return newCard;
     };
     Game.prototype.moveGroundToDeck = function () {
         if (this.ground.length < 2)
             alert("No more cards!");
-        var currCard = this.ground.pop();
-        while (this.ground.length > 0) {
-            this.deck.push(this.ground.pop());
+        else {
+            var currCard = this.ground.pop();
+            while (this.ground.length > 0) {
+                this.deck.push(this.ground.pop());
+            }
+            this.shuffleDeck();
+            this.ground.push(currCard);
         }
-        this.shuffleDeck();
-        this.ground.push(currCard);
-    };
-    Game.prototype.announceWinner = function () {
-        var _this = this;
-        setTimeout(function () {
-            var curtain = document.querySelector("#curtain");
-            var startBtn = document.querySelector("#curtain button");
-            var heading = document.querySelector("#curtain h1");
-            if (_this.humanPlayer.didWin())
-                heading.innerHTML = "You Won! Hooraaay";
-            else
-                heading.innerHTML = "Better Luck next time";
-            startBtn.innerHTML = "Restart?";
-            curtain.style.display = 'block';
-        }, 1000);
-        this.setGameState("end");
     };
     return Game;
 }());
