@@ -313,7 +313,9 @@ var Game = /** @class */ (function () {
     };
     Game.prototype.shuffleDeck = function () {
         // Sorting the deck with a fairly random criteria (50%)
-        this.deck.sort(function () { return Math.random() - 0.5; });
+        for (var i = 0; i < 5; i++) {
+            this.deck.sort(function () { return Math.random() - 0.5; });
+        }
     };
     Game.prototype.moveGroundToDeck = function () {
         if (this.ground.length < 2)

@@ -359,7 +359,9 @@ class Game {
 
     private shuffleDeck() {
         // Sorting the deck with a fairly random criteria (50%)
-        this.deck.sort( () => Math.random() - 0.5);
+        for (let i = 0; i < 5; i++) {
+            this.deck.sort( () => Math.random() - 0.5);
+        }
     }
 
     private moveGroundToDeck() {
