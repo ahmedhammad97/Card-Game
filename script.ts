@@ -39,9 +39,12 @@ abstract class Player {
     private cards: Array<Card>;
     private game: Game;
 
-    constructor(game: Game) {
-        this.game = game;
+    constructor() {
         this.cards = [];
+    }
+
+    public setGame(game) {
+        this.game = game;
     }
 
     public abstract playTurn(): void;
@@ -161,12 +164,15 @@ class Game {
     private state: string;
     private deck: Array<Card>;
     private ground: Array<Card>;
-    private humanPlayer: HumanPlayer;
-    private computerPlayer: ComputerPlayer;
+    private humanPlayer: Player;
+    private computerPlayer: Player;
 
-    constructor() {
-        this.humanPlayer = new HumanPlayer(this);
-        this.computerPlayer = new ComputerPlayer(this);
+    constructor(humanPlayer: Player, computerPlayer: Player) {
+        this.humanPlayer = humanPlayer;
+        this.humanPlayer.setGame(this);
+        this.computerPlayer = computerPlayer;
+        this.computerPlayer.setGame(this);
+
         this.deck = [];
         this.ground = [];
         this.state = "start";
@@ -366,5 +372,6 @@ class Game {
     }
 }
 
-
-let game = new Game();
+let humanPlayer = new HumanPlayer();
+let computerPlayer = new ComputerPlayer();
+let game = new Game(humanPlayer, computerPlayer);

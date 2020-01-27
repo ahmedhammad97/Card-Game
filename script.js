@@ -41,10 +41,12 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var Player = /** @class */ (function () {
-    function Player(game) {
-        this.game = game;
+    function Player() {
         this.cards = [];
     }
+    Player.prototype.setGame = function (game) {
+        this.game = game;
+    };
     Player.prototype.playCard = function (index) {
         var toPlayCard = this.cards[index];
         this.cards.splice(index, 1);
@@ -151,9 +153,11 @@ var ComputerPlayer = /** @class */ (function (_super) {
     return ComputerPlayer;
 }(Player));
 var Game = /** @class */ (function () {
-    function Game() {
-        this.humanPlayer = new HumanPlayer(this);
-        this.computerPlayer = new ComputerPlayer(this);
+    function Game(humanPlayer, computerPlayer) {
+        this.humanPlayer = humanPlayer;
+        this.humanPlayer.setGame(this);
+        this.computerPlayer = computerPlayer;
+        this.computerPlayer.setGame(this);
         this.deck = [];
         this.ground = [];
         this.state = "start";
@@ -322,4 +326,6 @@ var Game = /** @class */ (function () {
     };
     return Game;
 }());
-var game = new Game();
+var humanPlayer = new HumanPlayer();
+var computerPlayer = new ComputerPlayer();
+var game = new Game(humanPlayer, computerPlayer);
