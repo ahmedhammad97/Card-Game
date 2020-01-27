@@ -258,22 +258,25 @@ class Game {
     private setupHumanCardListener() {
         document.querySelectorAll(".humanArea .cardFront")
         .forEach(function(card) {
-            card.addEventListener('click', function(event) {
-                if (game.getGameState() === "play") {
-                    let selectedCard: HTMLElement = (event.target as HTMLElement);
-                    if (selectedCard.parentElement.classList.contains("raise")) {
-                        let index: number;
-                        index = parseInt(selectedCard.getAttribute("index"));
-                        game.humanPlayer.playCard(index);
-                        game.completeTurn();
-                    }
-                }
-            });
+            card.addEventListener('click', game.humanCardHandler);
         });
+    }
+
+    private humanCardHandler(event: Event) {
+        if (game.getGameState() === "play") {
+            let selectedCard: HTMLElement = (event.target as HTMLElement);
+            if (selectedCard.parentElement.classList.contains("raise")) {
+                let index: number;
+                index = parseInt(selectedCard.getAttribute("index"));
+                game.humanPlayer.playCard(index);
+                game.completeTurn();
+            }
+        }
     }
 
     private completeTurn() {
         this.renderCards();
+        if(game.humanPlayer.didWin()) return;
         this.setGameState("computer");
         setTimeout(() => {
             game.computerPlayer.playTurn();

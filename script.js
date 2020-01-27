@@ -229,21 +229,24 @@ var Game = /** @class */ (function () {
     Game.prototype.setupHumanCardListener = function () {
         document.querySelectorAll(".humanArea .cardFront")
             .forEach(function (card) {
-            card.addEventListener('click', function (event) {
-                if (game.getGameState() === "play") {
-                    var selectedCard = event.target;
-                    if (selectedCard.parentElement.classList.contains("raise")) {
-                        var index = void 0;
-                        index = parseInt(selectedCard.getAttribute("index"));
-                        game.humanPlayer.playCard(index);
-                        game.completeTurn();
-                    }
-                }
-            });
+            card.addEventListener('click', game.humanCardHandler);
         });
+    };
+    Game.prototype.humanCardHandler = function (event) {
+        if (game.getGameState() === "play") {
+            var selectedCard = event.target;
+            if (selectedCard.parentElement.classList.contains("raise")) {
+                var index = void 0;
+                index = parseInt(selectedCard.getAttribute("index"));
+                game.humanPlayer.playCard(index);
+                game.completeTurn();
+            }
+        }
     };
     Game.prototype.completeTurn = function () {
         this.renderCards();
+        if (game.humanPlayer.didWin())
+            return;
         this.setGameState("computer");
         setTimeout(function () {
             game.computerPlayer.playTurn();
