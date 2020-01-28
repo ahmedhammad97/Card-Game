@@ -212,19 +212,21 @@ var Game = /** @class */ (function () {
     };
     Game.prototype.setupCurtainListener = function () {
         document.querySelector("#curtain button")
-            .addEventListener('click', function () {
-            document.getElementById("curtain").style.display = "none";
-            game.startGame();
-        });
+            .addEventListener('click', game.curtainListener);
+    };
+    Game.prototype.curtainListener = function () {
+        document.getElementById("curtain").style.display = "none";
+        game.startGame();
     };
     Game.prototype.setupDeckListener = function () {
         document.querySelector(".deck .cardBack")
-            .addEventListener('click', function () {
-            if (game.getGameState() === "draw") {
-                game.humanPlayer.drawCard();
-                game.completeTurn();
-            }
-        });
+            .addEventListener('click', game.deckListener);
+    };
+    Game.prototype.deckListener = function () {
+        if (game.getGameState() === "draw") {
+            game.humanPlayer.drawCard();
+            game.completeTurn();
+        }
     };
     Game.prototype.setupHumanCardListener = function () {
         document.querySelectorAll(".humanArea .cardFront")

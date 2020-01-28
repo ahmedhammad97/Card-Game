@@ -239,20 +239,24 @@ class Game {
 
     private setupCurtainListener() {
         document.querySelector("#curtain button")
-        .addEventListener('click', function() {
-            document.getElementById("curtain").style.display = "none";
-            game.startGame();
-        });
+        .addEventListener('click', game.curtainListener);
+    }
+
+    private curtainListener() {
+        document.getElementById("curtain").style.display = "none";
+        game.startGame();
     }
 
     private setupDeckListener() {
         document.querySelector(".deck .cardBack")
-        .addEventListener('click', function() {
-            if (game.getGameState() === "draw"){
-                game.humanPlayer.drawCard();
-                game.completeTurn();
-            }
-        });
+        .addEventListener('click', game.deckListener);
+    }
+
+    private deckListener() {
+        if (game.getGameState() === "draw"){
+            game.humanPlayer.drawCard();
+            game.completeTurn();
+        }
     }
 
     private setupHumanCardListener() {
