@@ -239,7 +239,7 @@ class Game {
 
     private setupCurtainListener() {
         document.querySelector("#curtain button")
-        .addEventListener('click', game.curtainListener);
+        .addEventListener('click', this.curtainListener);
     }
 
     private curtainListener() {
@@ -249,7 +249,7 @@ class Game {
 
     private setupDeckListener() {
         document.querySelector(".deck .cardBack")
-        .addEventListener('click', game.deckListener);
+        .addEventListener('click', this.deckListener);
     }
 
     private deckListener() {

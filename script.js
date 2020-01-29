@@ -212,7 +212,7 @@ var Game = /** @class */ (function () {
     };
     Game.prototype.setupCurtainListener = function () {
         document.querySelector("#curtain button")
-            .addEventListener('click', game.curtainListener);
+            .addEventListener('click', this.curtainListener);
     };
     Game.prototype.curtainListener = function () {
         document.getElementById("curtain").style.display = "none";
@@ -220,7 +220,7 @@ var Game = /** @class */ (function () {
     };
     Game.prototype.setupDeckListener = function () {
         document.querySelector(".deck .cardBack")
-            .addEventListener('click', game.deckListener);
+            .addEventListener('click', this.deckListener);
     };
     Game.prototype.deckListener = function () {
         if (game.getGameState() === "draw") {
